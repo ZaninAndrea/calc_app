@@ -1,0 +1,72 @@
+{
+  "name": "calc",
+  "version": "0.1.0",
+  "author": "Andrea Zanin",
+  "homepage": "./",
+  "description": "Editor for calc files",
+  "main": "public/electron.js",
+  "build": {
+    "appId": "com.baida.calc",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "dependencies": {
+    "bufferutil": "^4.0.3",
+    "canvas": "^2.6.1",
+    "electron-is-dev": "^0.3.0",
+    "fibers": "^5.0.0",
+    "node-sass": "^5.0.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "^4.0.2",
+    "sass": "^1.32.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.5",
+    "utf-8-validate": "^5.0.4",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-plugin-serve": "^1.2.1"
+  },
+  "lint-staged": {
+    "{{public,src}/**/*.{scss,js,json},package.json}": [
+      "prettier --write \"{{public,src}/**/*.{scss,js,json},package.json}\"",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "pretty": "prettier --write \"{{public,src}/**/*.{css,scss,js,json},package.json}\"",
+    "precommit": "lint-staged",
+    "electron-dev": "concurrently \"export BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-pack": "PKG_CONFIG_PATH=/usr/local/Cellar/freetype/2.10.1/lib/pkgconfig; build --em.main=build/electron.js -c electron-builder.yml",
+    "preelectron-pack": "yarn build"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.0",
+    "electron": "^1.7.5",
+    "electron-builder": "^19.56.2",
+    "husky": "^0.14.3",
+    "lint-staged": "^4.2.3",
+    "prettier": "^1.7.4",
+    "wait-on": "^2.0.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

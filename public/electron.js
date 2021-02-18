@@ -1,0 +1,120 @@
+const { app, BrowserWindow, ipcMain } = require("electron")
+const path = require("path")
+const isDev = require("electron-is-dev")
+const child_process = require("child_process")
+
+ipcMain.on("update", (_, source) => {
+    try {
+        colorize = child_process.execFileSync(
+            "./public/calc-notebook",
+            ["colorize"],
+            {
+                env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
+                cwd: app.getAppPath(),
+                input: source,
+            }
+        )
+
+        mainWindow.webContents.send("colorization", colorize.toString())
+    } catch (e) {
+        mainWindow.webContents.send("colorization", "")
+    }
+
+    try {
+        let evals = child_process.execFileSync(
+            "./public/calc-notebook",
+            ["execute"],
+            {
+                env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
+                cwd: app.getAppPath(),
+                input: source,
+            }
+        )
+
+        let parsedEvals = evals.toString().split("\n")
+        parsedEvals = parsedEvals.slice(0, parsedEvals.length - 1)
+        mainWindow.webContents.send("evaluations", parsedEvals)
+    } catch (e) {
+        let emptyEvals = []
+
+        for (let i = 0; i < source.split("\n").length; i++) {
+            emptyEvals.push("X")
+        }
+        mainWindow.webContents.send("evaluations", emptyEvals)
+    }
+})
+
+let mainWindow
+
+function createWindow() {
+    mainWindow = new BrowserWindow({ width: 900, height: 680 })
+    mainWindow.loadURL(
+        isDev
+            ? "http://localhost:3000"
+            : `file://${path.join(__dirname, "../build/index.html")}`
+    ) // load the react app
+    mainWindow.on("closed", () => (mainWindow = null))
+
+    const { app, Menu } = require("electron")
+
+    const isMac = process.platform === "darwin"
+
+    const template = [
+        ...(isMac
+            ? [
+                  {
+                      label: "Calc",
+                      submenu: [
+                          { role: "about" },
+                          { type: "separator" },
+                          { role: "services" },
+                          { type: "separator" },
+                          { role: "hide" },
+                          { role: "hideothers" },
+                          { role: "unhide" },
+                          { type: "separator" },
+                          { role: "quit" },
+                      ],
+                  },
+              ]
+            : []),
+        {
+            label: "File",
+            submenu: [
+                {
+                    label: "New file",
+                    click: async () => {},
+                },
+                {
+                    label: "Open",
+                    click: async () => {},
+                },
+                {
+                    label: "Save",
+                    click: async () => {},
+                },
+                {
+                    label: "Save as",
+                    click: async () => {},
+                },
+            ],
+        },
+    ]
+
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+}
+
+app.on("ready", createWindow)
+
+// on MacOS leave process running also with no windows
+app.on("window-all-closed", () => {
+    app.quit()
+})
+
+// if there are no windows create one
+app.on("activate", () => {
+    if (mainWindow === null) {
+        createWindow()
+    }
+})

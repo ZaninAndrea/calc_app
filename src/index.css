@@ -1,0 +1,104 @@
+#root,
+body {
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0;
+    padding: 0;
+}
+.main {
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    display: grid;
+    grid-template-columns: auto 64px;
+}
+
+.evaluations {
+    font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+    background: transparent;
+    white-space: pre-wrap;
+    line-height: 1.5em;
+    word-wrap: break-word;
+    padding: 1rem;
+    font-size: 1rem;
+}
+.evaluations span {
+    color: green;
+}
+
+/** ---------------------------- */
+/** --- Code editor ------------ */
+/** ---------------------------- */
+.code-edit-container {
+    position: relative;
+}
+
+.code-input,
+.code-output {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(80vw - 2em);
+    height: calc(100vh - 2em);
+    padding: 1rem;
+    border: none;
+    font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+    background: transparent;
+    white-space: pre-wrap;
+    line-height: 1.5em;
+    word-wrap: break-word;
+    font-size: 1rem;
+}
+
+.code-input {
+    opacity: 1;
+    margin: 0;
+    color: hsl(0, 0%, 40%);
+    resize: none;
+    border-color: none;
+    outline: none;
+}
+
+.code-output {
+    pointer-events: none;
+    z-index: 3;
+    margin: 0;
+    overflow-y: auto;
+}
+code {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 1rem;
+    display: block;
+    color: hsl(0, 0%, 20%);
+    background: none;
+    text-shadow: 0 1px white;
+    font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+    font-size: 1em;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+}
+
+.code-edit-container :not(pre) > code[class*="language-"],
+.code-edit-container pre[class*="language-"] {
+    background: transparent;
+    margin: 0;
+}
+
+.calc-token-function {
+    color: green;
+}
+.calc-token-literal {
+    color: purple;
+}
+.calc-token-comment {
+    color: hsl(0, 0%, 50%);
+}

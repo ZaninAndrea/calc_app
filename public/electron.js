@@ -5,22 +5,6 @@ const child_process = require("child_process")
 
 ipcMain.on("update", (_, source) => {
     try {
-        colorize = child_process.execFileSync(
-            "./public/calc-notebook",
-            ["colorize"],
-            {
-                env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
-                cwd: app.getAppPath(),
-                input: source,
-            }
-        )
-
-        mainWindow.webContents.send("colorization", colorize.toString())
-    } catch (e) {
-        mainWindow.webContents.send("colorization", "")
-    }
-
-    try {
         let evals = child_process.execFileSync(
             "./public/calc-notebook",
             ["execute"],
@@ -41,6 +25,23 @@ ipcMain.on("update", (_, source) => {
             emptyEvals.push("X")
         }
         mainWindow.webContents.send("evaluations", emptyEvals)
+    }
+})
+ipcMain.on("colorize", (e, source) => {
+    try {
+        colorize = child_process.execFileSync(
+            "./public/calc-notebook",
+            ["colorize"],
+            {
+                env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
+                cwd: app.getAppPath(),
+                input: source,
+            }
+        )
+
+        e.returnValue = colorize.toString()
+    } catch (e) {
+        e.returnValue = colorize.toString()
     }
 })
 
@@ -100,19 +101,6 @@ function createWindow() {
             ],
         },
         {
-            label: "View",
-            submenu: [
-                { role: "reload" },
-                {
-                    label: "Toggle Dev Tools",
-                    click: () => {
-                        mainWindow.webContents.toggleDevTools()
-                    },
-                },
-                { role: "togglefullscreen" },
-            ],
-        },
-        {
             label: "Edit",
             submenu: [
                 {
@@ -142,6 +130,19 @@ function createWindow() {
                     accelerator: "CmdOrCtrl+A",
                     selector: "selectAll:",
                 },
+            ],
+        },
+        {
+            label: "View",
+            submenu: [
+                { role: "reload" },
+                {
+                    label: "Toggle Dev Tools",
+                    click: () => {
+                        mainWindow.webContents.toggleDevTools()
+                    },
+                },
+                { role: "togglefullscreen" },
             ],
         },
     ]

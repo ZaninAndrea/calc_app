@@ -1,9 +1,10 @@
 import React, { Component } from "react"
+import Editor from "react-simple-code-editor"
 import "./index.css"
 const { ipcRenderer, clipboard } = window.require("electron")
 
-function roundedNumber(val) {
-    return Math.round((parseFloat(val) + Number.EPSILON) * 1000) / 1000
+function roundedNumber(val, decimals) {
+    return parseFloat(val).toString()
 }
 
 class App extends Component {
@@ -23,49 +24,39 @@ class App extends Component {
     render() {
         return (
             <div className="main">
-                <div className="code-edit-container">
-                    <textarea
-                        className="code-input"
-                        value={this.state.source}
-                        onChange={(e) => {
-                            this.setState({ source: e.target.value })
-                            ipcRenderer.send("update", e.target.value)
-                        }}
-                    />
-                    <pre className="code-output">
-                        <code
-                            dangerouslySetInnerHTML={{
-                                __html: this.state.colorization,
-                            }}
-                        />
-                    </pre>
-                </div>
                 <div className="evaluations">
                     {this.state.evaluations.map((val) =>
                         val === "X" ? (
                             <br />
                         ) : val === "!" ? (
-                            <React.Fragment>
-                                <span className="error">{val}</span>
-                                <br />
-                            </React.Fragment>
+                            <span className="error">ERR</span>
                         ) : (
-                            <>
-                                <span
-                                    className="value"
-                                    onClick={() =>
-                                        clipboard.writeText(
-                                            roundedNumber(val).toString()
-                                        )
-                                    }
-                                >
-                                    {roundedNumber(val)}
-                                </span>
-                                <br />
-                            </>
+                            <span
+                                className="value"
+                                onClick={() => {
+                                    clipboard.writeText(
+                                        roundedNumber(val, 12).toString()
+                                    )
+                                }}
+                            >
+                                {roundedNumber(val, 12).toString()}
+                            </span>
                         )
                     )}
                 </div>
+                <Editor
+                    className="code-edit-container"
+                    value={this.state.source}
+                    onValueChange={(source) => {
+                        this.setState({
+                            source,
+                        })
+                        ipcRenderer.send("update", source)
+                    }}
+                    highlight={(source) =>
+                        ipcRenderer.sendSync("colorize", source)
+                    }
+                />
             </div>
         )
     }

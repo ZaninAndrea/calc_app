@@ -14,7 +14,7 @@ body {
     padding: 0;
 
     display: grid;
-    grid-template-columns: auto 64px;
+    grid-template-columns: auto 128px;
 }
 
 .evaluations {
@@ -28,6 +28,26 @@ body {
 }
 .evaluations span {
     color: green;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 8px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    padding: 0 4px;
+}
+.evaluations span.value:hover {
+    background-color: green;
+    color: white;
+    cursor: pointer;
+}
+.evaluations span.error {
+    color: red;
 }
 
 /** ---------------------------- */

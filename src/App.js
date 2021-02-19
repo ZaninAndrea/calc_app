@@ -1,6 +1,10 @@
 import React, { Component } from "react"
 import "./index.css"
-const { ipcRenderer } = window.require("electron")
+const { ipcRenderer, clipboard } = window.require("electron")
+
+function roundedNumber(val) {
+    return Math.round((parseFloat(val) + Number.EPSILON) * 1000) / 1000
+}
 
 class App extends Component {
     constructor(props) {
@@ -40,11 +44,25 @@ class App extends Component {
                     {this.state.evaluations.map((val) =>
                         val === "X" ? (
                             <br />
-                        ) : (
+                        ) : val === "!" ? (
                             <React.Fragment>
-                                <span>{val}</span>
+                                <span className="error">{val}</span>
                                 <br />
                             </React.Fragment>
+                        ) : (
+                            <>
+                                <span
+                                    className="value"
+                                    onClick={() =>
+                                        clipboard.writeText(
+                                            roundedNumber(val).toString()
+                                        )
+                                    }
+                                >
+                                    {roundedNumber(val)}
+                                </span>
+                                <br />
+                            </>
                         )
                     )}
                 </div>

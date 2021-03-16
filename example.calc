@@ -1,0 +1,45 @@
+# With calc notebook you can do simple calculations and see the result on the left
+# To copy the result simply click it
+5 * 3
+
+# Or complex ones
+log(14^(sqrt(55)*3)) + 2^(3/55)
+
+# You can also save a result and reuse it later
+discount: 20%
+price: 50
+price * (1- discount)
+
+# The order doesn't really matter though: you can use values defined later on
+deposited: 500
+balance: round(deposited * (1+interest_rate))
+balance_after_5_years: round(deposited * (1+interest_rate)^5)
+interest_rate: 5%
+
+# Try changing the interest rate, the balance will be updated automatically
+balance
+
+# You can type numbers in a few different ways:
+5,32
+5.000.000
+32%
+
+# A full list of the mathematical functions supported
+5 + 5
+4 - 2
+9 / 6
+-8 * 2
+2 ^ 3
+
+sqrt(16)
+log(100)
+ln(e^5)
+
+sin(pi/2)
+cos(pi/2)
+tan(pi/4)
+
+abs(-3)
+round(3,6)
+ceil(3,1)
+floor(3,9)

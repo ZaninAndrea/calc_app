@@ -1,7 +1,0 @@
-appId: com.baida.calc
-files:
-    - build/**/*
-    - node_modules/**/*"
-directories:
-    buildResources: assets
-productName: Calc

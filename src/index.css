@@ -1,4 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
+
+:root{
+    --bg-color: white;
+    --eval-color: #007a25;
+    --eval-hover-color: #6efe9c;
+    --error-color: #ee0719;
+    --function-color: #24a7ff;
+    --literal-color: #b03702;
+    --constant-color: #7400bd;
+    --comment-color: hsl(0, 0%, 50%);
+}
+
+[data-theme="dark"]{
+    /* --bg-color: #121212; */
+}
 
 #root,
 body {
@@ -6,13 +23,58 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+    background-color: var(--bg-color);
+
 }
+
+.titleBar{
+    display: none;
+}
+
+[data-platform="darwin"] .titleBar{
+    display: grid;
+    grid-template-columns: 64px auto 64px;
+    grid-template-areas: ". title buttons";
+    height: 32px;
+    width: calc(100vw - 15px);
+    position:absolute;
+    background-color: var(--bg-color);
+    -webkit-app-region: drag;
+    z-index: 100000;
+
+    text-align: center;
+    line-height: 32px;
+    font-family: "Montserrat";
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.titleBar span{
+    grid-area: title;
+}
+.titleBar div{
+    padding-right:8px;
+    display: flex;
+    grid-area: buttons;
+    justify-content: flex-end;
+}
+
 .main {
     width: calc(100vw - 15px);
     min-height: 100vh;
     margin: 0;
     padding: 0;
     display: flex;
+}
+
+[data-platform="darwin"] .main{
+    margin-top: 32px;
+    min-height: calc(100vh - 32px);
 }
 
 .evaluations {
@@ -27,8 +89,9 @@ body {
     min-width: 64px;
     width: fit-content;
 }
+
 .evaluations span {
-    color: #007a25;
+    color: var(--eval-color);
     display: block;
     width: 100%;
     text-align: right;
@@ -40,11 +103,11 @@ body {
     user-select: none;
 }
 .evaluations span.value:hover {
-    color: #6efe9c;
+    color: var(--eval-hover-color);
     cursor: pointer;
 }
 .evaluations span.error {
-    color: #ee0719;
+    color: var(--error-color);
 }
 
 .code-edit-container {
@@ -60,14 +123,14 @@ body {
     font-family: "Roboto Mono", monospace !important;
 }
 .calc-token-function {
-    color: #24a7ff;
+    color:var(--function-color);
 }
 .calc-token-literal {
-    color: #b03702;
+    color:var(--literal-color);
 }
 .calc-token-constant {
-    color: #7400bd;
+    color:var(--constant-color);
 }
 .calc-token-comment {
-    color: hsl(0, 0%, 50%);
+    color: var(--comment-color);
 }

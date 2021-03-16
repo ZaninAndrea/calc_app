@@ -32,9 +32,26 @@ function updateEvaluations(source) {
   }
 }
 
+let autosave = false;
+let saveTimeout = null;
+function delayedSave() {
+  if (saveTimeout !== null) {
+    clearTimeout(saveTimeout);
+  }
+
+  saveTimeout = setTimeout(() => {
+    fs.writeFileSync(lastPath, sourceCode, "utf8");
+    mainWindow.webContents.send("saved");
+  }, 700);
+}
+
 ipcMain.on("update", (_, source) => {
   sourceCode = source;
   updateEvaluations(source);
+
+  if (lastPath !== "" && autosave) {
+    delayedSave();
+  }
 });
 ipcMain.on("colorize", (e, source) => {
   try {
@@ -57,14 +74,19 @@ ipcMain.on("colorize", (e, source) => {
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 900, height: 680 });
+  const isMac = process.platform === "darwin";
+
+  mainWindow = new BrowserWindow({
+    width: 900,
+    height: 680,
+    titleBarStyle: isMac ? "hiddenInset" : "default"
+  });
   mainWindow.loadURL(
     isDev
       ? "http://localhost:3000"
       : `file://${path.join(__dirname, "../build/index.html")}`
   ); // load the react app
   mainWindow.on("closed", () => (mainWindow = null));
-  const isMac = process.platform === "darwin";
 
   const template = [
     ...(isMac
@@ -95,6 +117,9 @@ function createWindow() {
             lastPath = "";
             sourceCode = "";
             mainWindow.webContents.send("updateSourceCode", sourceCode);
+
+            mainWindow.webContents.send("saved");
+            mainWindow.webContents.send("fileName", "New Notebook");
             updateEvaluations(sourceCode);
           }
         },
@@ -102,17 +127,22 @@ function createWindow() {
           label: "Open",
           accelerator: "CmdOrCtrl+O",
           click: async () => {
-            const path = dialog.showOpenDialog(mainWindow, {
+            const filePath = dialog.showOpenDialog(mainWindow, {
               title: "Open calc file",
               filters: [{ name: "Calc file", extensions: ["calc"] }],
               properties: ["openFile"]
             });
 
-            if (path.length > 0) {
-              const content = fs.readFileSync(path[0], "utf8");
+            if (filePath.length > 0) {
+              const content = fs.readFileSync(filePath[0], "utf8");
               sourceCode = content;
               mainWindow.webContents.send("updateSourceCode", content);
-              lastPath = path[0];
+              mainWindow.webContents.send("saved");
+              mainWindow.webContents.send(
+                "fileName",
+                path.basename(filePath[0], ".calc")
+              );
+              lastPath = filePath[0];
               updateEvaluations(content);
             }
           }
@@ -122,18 +152,19 @@ function createWindow() {
           accelerator: "CmdOrCtrl+S",
           click: async () => {
             if (lastPath === "") {
-              const path = dialog.showSaveDialog(mainWindow, {
+              const filePath = dialog.showSaveDialog(mainWindow, {
                 title: "Save calc file",
                 filters: [{ name: "Calc file", extensions: ["calc"] }],
                 properties: ["createDirectory"]
               });
 
-              if (path.length > 0) {
-                lastPath = path;
+              if (filePath.length > 0) {
+                lastPath = filePath;
               }
             }
 
             if (lastPath !== "") {
+              mainWindow.webContents.send("saved");
               fs.writeFileSync(lastPath, sourceCode, "utf8");
             }
           }
@@ -142,14 +173,15 @@ function createWindow() {
           label: "Save as",
           accelerator: "Shift+CmdOrCtrl+S",
           click: async () => {
-            const path = dialog.showSaveDialog(mainWindow, {
+            const filePath = dialog.showSaveDialog(mainWindow, {
               title: "Save calc file",
               filters: [{ name: "Calc file", extensions: ["calc"] }],
               properties: ["createDirectory"]
             });
 
-            if (path.length > 0) {
-              lastPath = path;
+            if (filePath.length > 0) {
+              mainWindow.webContents.send("saved");
+              lastPath = filePath;
               fs.writeFileSync(lastPath, sourceCode, "utf8");
             }
           }

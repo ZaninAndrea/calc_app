@@ -45,6 +45,14 @@ distance / time [km/hour]
 (10 [inch]) [cm]
 (1 [month]) [hours]
 (65 [kg]) [pounds]
+(1 [atm]) [mmHg]
+
+sin(90 [deg])
+sin(pi [rad])
+
+# You can even use made up units:
+heal: 0,5 [hearts/apples]
+(5 [apples]) * heal
 
 # A full list of the mathematical functions supported
 5 + 5

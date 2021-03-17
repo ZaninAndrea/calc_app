@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "@electron-forge/maker-appx": "^6.0.0-beta.54",
     "@electron-forge/maker-dmg": "^6.0.0-beta.54",
     "electron-is-dev": "^0.3.0",
     "electron-squirrel-startup": "^1.0.0",
@@ -77,17 +78,10 @@
       },
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel",
+          "name": "@electron-forge/maker-appx",
           "config": {
-            "name": "calc"
+            "publisher": "CN=Baida"
           }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin",
-            "win32"
-          ]
         },
         {
           "name": "@electron-forge/maker-dmg",

@@ -4,7 +4,7 @@
 :root {
     --bg-color: white;
     --eval-color: #007a25;
-    --eval-unit-color: #004e18;
+    --eval-unit-color: #4a7456;
     --eval-hover-color: #6efe9c;
     --error-color: #ee0719;
     --function-color: #24a7ff;
@@ -119,6 +119,7 @@ body {
 
 .code-edit-container {
     flex-grow: 1;
+    flex-basis: 0;
 }
 
 .code-edit-container textarea,

@@ -7,29 +7,50 @@ const fs = require("fs");
 let lastPath = "";
 let sourceCode = "";
 
+let updateLocked = false;
+let queuedUpdate = null;
 function updateEvaluations(source) {
-  try {
-    let evals = child_process.execFileSync(
+  return new Promise(resolve => {
+    if (updateLocked) {
+      queuedUpdate = source;
+      return;
+    }
+
+    updateLocked = true;
+    const process = child_process.execFile(
       "./public/calc-notebook",
       ["execute"],
       {
         env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
-        cwd: app.getAppPath(),
-        input: source
+        cwd: app.getAppPath()
+      },
+      async (err, stdout, stderr) => {
+        if (err) {
+          let emptyEvals = [];
+
+          for (let i = 0; i < source.split("\n").length; i++) {
+            emptyEvals.push("X");
+          }
+          mainWindow.webContents.send("evaluations", emptyEvals, source);
+        } else {
+          let parsedEvals = stdout.toString().split("\n");
+          parsedEvals = parsedEvals.slice(0, parsedEvals.length - 1);
+          mainWindow.webContents.send("evaluations", parsedEvals, source);
+        }
+
+        updateLocked = false;
+        if (queuedUpdate !== null) {
+          source = queuedUpdate;
+          queuedUpdate = null;
+          updateEvaluations(source);
+        }
+
+        resolve();
       }
     );
-
-    let parsedEvals = evals.toString().split("\n");
-    parsedEvals = parsedEvals.slice(0, parsedEvals.length - 1);
-    mainWindow.webContents.send("evaluations", parsedEvals);
-  } catch (e) {
-    let emptyEvals = [];
-
-    for (let i = 0; i < source.split("\n").length; i++) {
-      emptyEvals.push("X");
-    }
-    mainWindow.webContents.send("evaluations", emptyEvals);
-  }
+    process.stdin.write(source);
+    process.stdin.end();
+  });
 }
 
 let autosave = false;
@@ -53,9 +74,10 @@ ipcMain.on("update", (_, source) => {
     delayedSave();
   }
 });
+
 ipcMain.on("colorize", (e, source) => {
   try {
-    colorize = child_process.execFileSync(
+    let colorize = child_process.execFileSync(
       "./public/calc-notebook",
       ["colorize"],
       {
@@ -67,7 +89,7 @@ ipcMain.on("colorize", (e, source) => {
 
     e.returnValue = colorize.toString();
   } catch (e) {
-    e.returnValue = colorize.toString();
+    e.returnValue = source;
   }
 });
 

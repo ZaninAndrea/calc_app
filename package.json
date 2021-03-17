@@ -40,7 +40,6 @@
     "pretty": "prettier --write \"{{public,src}/**/*.{css,scss,js,json},package.json}\"",
     "precommit": "lint-staged",
     "electron-dev": "concurrently \"export BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && electron-forge start\"",
-    "electron-pack-old": "PKG_CONFIG_PATH=/usr/local/Cellar/freetype/2.10.4/lib/pkgconfig; build --em.main=build/electron.js -c electron-builder.yml",
     "premake": "yarn build",
     "package": "electron-forge package",
     "make": "electron-forge make"

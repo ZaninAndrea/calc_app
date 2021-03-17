@@ -1,19 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
 
-
-:root{
+:root {
     --bg-color: white;
     --eval-color: #007a25;
+    --eval-unit-color: #004e18;
     --eval-hover-color: #6efe9c;
     --error-color: #ee0719;
     --function-color: #24a7ff;
     --literal-color: #b03702;
     --constant-color: #7400bd;
     --comment-color: hsl(0, 0%, 50%);
+    --unit-definition-color: var(--comment-color);
 }
 
-[data-theme="dark"]{
+[data-theme="dark"] {
     /* --bg-color: #121212; */
 }
 
@@ -25,20 +26,19 @@ body {
     padding: 0;
     overflow-x: hidden;
     background-color: var(--bg-color);
-
 }
 
-.titleBar{
+.titleBar {
     display: none;
 }
 
-[data-platform="darwin"] .titleBar{
+[data-platform="darwin"] .titleBar {
     display: grid;
     grid-template-columns: 64px auto 64px;
     grid-template-areas: ". title buttons";
     height: 32px;
     width: calc(100vw - 15px);
-    position:absolute;
+    position: absolute;
     background-color: var(--bg-color);
     -webkit-app-region: drag;
     z-index: 100000;
@@ -54,11 +54,11 @@ body {
     -ms-user-select: none; /* Internet Explorer/Edge */
 }
 
-.titleBar span{
+.titleBar span {
     grid-area: title;
 }
-.titleBar div{
-    padding-right:8px;
+.titleBar div {
+    padding-right: 8px;
     display: flex;
     grid-area: buttons;
     justify-content: flex-end;
@@ -72,7 +72,7 @@ body {
     display: flex;
 }
 
-[data-platform="darwin"] .main{
+[data-platform="darwin"] .main {
     margin-top: 32px;
     min-height: calc(100vh - 32px);
 }
@@ -101,6 +101,7 @@ body {
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none;
+    word-wrap: no-wrap;
 }
 .evaluations span.value:hover {
     color: var(--eval-hover-color);
@@ -108,6 +109,12 @@ body {
 }
 .evaluations span.error {
     color: var(--error-color);
+}
+
+.evaluations span.unitOfMeasurement {
+    display: inline;
+    width: auto;
+    color: var(--eval-unit-color);
 }
 
 .code-edit-container {
@@ -123,14 +130,21 @@ body {
     font-family: "Roboto Mono", monospace !important;
 }
 .calc-token-function {
-    color:var(--function-color);
+    color: var(--function-color);
 }
 .calc-token-literal {
-    color:var(--literal-color);
+    color: var(--literal-color);
 }
 .calc-token-constant {
-    color:var(--constant-color);
+    color: var(--constant-color);
 }
 .calc-token-comment {
     color: var(--comment-color);
+}
+
+.calc-token-literal-unit,
+.calc-token-number-unit,
+.calc-token-operator-unit,
+.calc-token-bracket-unit {
+    color: var(--unit-definition-color);
 }

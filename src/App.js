@@ -27,6 +27,33 @@ function roundedNumber(val, decimals) {
   return parseFloat(val).toString();
 }
 
+function DisplayEval({ evaluation }) {
+  if (evaluation === "X") {
+    return <br />;
+  }
+
+  if (evaluation === "!") {
+    return <span className="error">ERR</span>;
+  }
+
+  const splitEval = evaluation.split(" ");
+  const number = roundedNumber(splitEval[0], 12).toString();
+  const unit = splitEval.slice(1).join(" ");
+
+  return (
+    <span
+      className="value"
+      onClick={() => {
+        clipboard.writeText(number);
+      }}
+    >
+      {number}
+      {unit && " "}
+      {unit && <span className="unitOfMeasurement">{unit}</span>}
+    </span>
+  );
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -66,22 +93,9 @@ class App extends Component {
         </div>
         <div className="main">
           <div className="evaluations">
-            {this.state.evaluations.map(val =>
-              val === "X" ? (
-                <br />
-              ) : val === "!" ? (
-                <span className="error">ERR</span>
-              ) : (
-                <span
-                  className="value"
-                  onClick={() => {
-                    clipboard.writeText(roundedNumber(val, 12).toString());
-                  }}
-                >
-                  {roundedNumber(val, 12).toString()}
-                </span>
-              )
-            )}
+            {this.state.evaluations.map(val => (
+              <DisplayEval evaluation={val} />
+            ))}
           </div>
           <Editor
             className="code-edit-container"

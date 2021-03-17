@@ -5,10 +5,15 @@
 # Or complex ones
 log(14^(sqrt(55)*3)) + 2^(3/55)
 
+# You can type numbers in a few different ways:
+5,32
+5.000.000
+32%
+
 # You can also save a result and reuse it later
 discount: 20%
 price: 50
-price * (1- discount)
+price * (1 - discount)
 
 # The order doesn't really matter though: you can use values defined later on
 deposited: 500
@@ -19,10 +24,27 @@ interest_rate: 5%
 # Try changing the interest rate, the balance will be updated automatically
 balance
 
-# You can type numbers in a few different ways:
-5,32
-5.000.000
-32%
+# You can specify the unit for any line by putting it in brackets
+item_price: 5 [usd]
+amount: 7
+total: item_price * amount
+
+# Or in a slightly more complex example
+distance: 6 [km]
+time: 3 [min]
+speed: distance / time
+
+# km/min is a weird unit for speed, we can change it by specifying the unit we want:
+distance / time [km/hour]
+
+# You can leverage this feature to quickly convert units
+(72 [km/hour]) [m/s]
+
+# Some of the supported units
+(15 [celsius]) [fahrenheit]
+(10 [inch]) [cm]
+(1 [month]) [hours]
+(65 [kg]) [pounds]
 
 # A full list of the mathematical functions supported
 5 + 5

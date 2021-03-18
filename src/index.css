@@ -3,9 +3,9 @@
 
 :root {
     --bg-color: white;
-    --eval-color: #007a25;
-    --eval-unit-color: #4a7456;
-    --eval-hover-color: #6efe9c;
+    --eval-color: #00b371;
+    --eval-unit-color: #288a66;
+    --eval-hover-color: #00e691;
     --error-color: #ee0719;
     --function-color: #24a7ff;
     --literal-color: #b03702;
@@ -30,6 +30,18 @@ body {
 
 .titleBar {
     display: none;
+}
+
+.syncIcon,
+.syncDisabledIcon {
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    margin-right: 0px;
+}
+.syncIcon:hover,
+.syncDisabledIcon:hover {
+    fill: var(--comment-color);
 }
 
 [data-platform="darwin"] .titleBar {
@@ -104,7 +116,8 @@ body {
     user-select: none;
     word-wrap: no-wrap;
 }
-.evaluations span.value:hover {
+.evaluations span.value:hover,
+.evaluations span.value:hover span.unitOfMeasurement {
     color: var(--eval-hover-color);
     cursor: pointer;
 }
@@ -116,6 +129,7 @@ body {
     display: inline;
     width: auto;
     color: var(--eval-unit-color);
+    word-spacing: -5px;
 }
 
 .code-edit-container {

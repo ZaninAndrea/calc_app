@@ -95,6 +95,33 @@ ipcMain.on("colorize", (e, source) => {
 
 let mainWindow;
 
+ipcMain.on("setAutosave", (_, val) => {
+  if (!val || lastPath != "") {
+    autosave = val;
+    mainWindow.webContents.send("autosave", val);
+  } else {
+    if (lastPath === "") {
+      const filePath = dialog.showSaveDialog(mainWindow, {
+        title: "Save calc file",
+        filters: [{ name: "Calc file", extensions: ["calc"] }],
+        properties: ["createDirectory"]
+      });
+
+      if (filePath.length > 0) {
+        lastPath = filePath;
+      }
+    }
+
+    if (lastPath !== "") {
+      autosave = val;
+      mainWindow.webContents.send("autosave", val);
+      mainWindow.webContents.send("saved");
+      mainWindow.webContents.send("fileName", path.basename(lastPath, ".calc"));
+      fs.writeFileSync(lastPath, sourceCode, "utf8");
+    }
+  }
+});
+
 function createWindow() {
   const isMac = process.platform === "darwin";
 
@@ -143,6 +170,8 @@ function createWindow() {
             mainWindow.webContents.send("saved");
             mainWindow.webContents.send("fileName", "New Notebook");
             updateEvaluations(sourceCode);
+            autosave = false;
+            mainWindow.webContents.send("autosave", false);
           }
         },
         {
@@ -160,6 +189,8 @@ function createWindow() {
               sourceCode = content;
               mainWindow.webContents.send("updateSourceCode", content);
               mainWindow.webContents.send("saved");
+              autosave = true;
+              mainWindow.webContents.send("autosave", true);
               mainWindow.webContents.send(
                 "fileName",
                 path.basename(filePath[0], ".calc")
@@ -188,6 +219,11 @@ function createWindow() {
             if (lastPath !== "") {
               mainWindow.webContents.send("saved");
               fs.writeFileSync(lastPath, sourceCode, "utf8");
+
+              mainWindow.webContents.send(
+                "fileName",
+                path.basename(lastPath, ".calc")
+              );
             }
           }
         },
@@ -205,6 +241,11 @@ function createWindow() {
               mainWindow.webContents.send("saved");
               lastPath = filePath;
               fs.writeFileSync(lastPath, sourceCode, "utf8");
+
+              mainWindow.webContents.send(
+                "fileName",
+                path.basename(lastPath, ".calc")
+              );
             }
           }
         }
@@ -259,6 +300,8 @@ function createWindow() {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+
+  mainWindow.webContents.send("autosave", autosave);
 }
 
 app.on("ready", createWindow);

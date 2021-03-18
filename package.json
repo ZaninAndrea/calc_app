@@ -1,6 +1,6 @@
 {
   "name": "calc",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Andrea Zanin",
   "homepage": "./",
   "description": "Editor for calc files",
@@ -74,7 +74,8 @@
     "forge": {
       "packagerConfig": {
         "name": "Calc Notebook",
-        "icon": "./public/fs_notes.icns"
+        "icon": "./public/fs_notes.icns",
+        "extendInfo": "./Info.plist"
       },
       "makers": [
         {

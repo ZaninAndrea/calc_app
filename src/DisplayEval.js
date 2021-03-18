@@ -1,7 +1,24 @@
 import React from "react";
 
 function roundedNumber(val, decimals) {
-  return parseFloat(val).toString();
+  let numberStr = parseFloat(val).toString();
+
+  let intPart = numberStr.split(".")[0];
+  let i = intPart.length % 3;
+
+  let finalString = intPart.slice(0, i);
+  console.log(intPart, i, finalString);
+  while (i < intPart.length - 1) {
+    if (finalString !== "") finalString += ".";
+    finalString += intPart.slice(i, i + 3);
+    i += 3;
+  }
+
+  if (numberStr.split(".").length > 1) {
+    finalString += "," + numberStr.split(".")[1];
+  }
+
+  return finalString;
 }
 
 function computeLineTotal(sourceLine, charsPerLine) {

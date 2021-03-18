@@ -248,6 +248,14 @@ function createWindow() {
               );
             }
           }
+        },
+        { type: "separator" },
+        {
+          label: "Print",
+          accelerator: "CmdOrCtrl+P",
+          click: async () => {
+            mainWindow.webContents.print();
+          }
         }
       ]
     },

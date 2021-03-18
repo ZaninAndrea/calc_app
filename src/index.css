@@ -3,14 +3,16 @@
 
 :root {
     --bg-color: white;
-    --eval-color: #00b371;
-    --eval-unit-color: #288a66;
-    --eval-hover-color: #00e691;
+    --text-color: black;
+    --light-text-color: hsl(0, 0%, 50%);
+    --eval-color: var(--text-color);
+    --eval-unit-color: var(--light-text-color);
+    --eval-hover-color: #00b371;
     --error-color: #ee0719;
     --function-color: #24a7ff;
     --literal-color: #b03702;
     --constant-color: #7400bd;
-    --comment-color: hsl(0, 0%, 50%);
+    --comment-color: var(--light-text-color);
     --unit-definition-color: var(--comment-color);
 }
 
@@ -163,4 +165,33 @@ body {
 .calc-token-operator-unit,
 .calc-token-bracket-unit {
     color: var(--unit-definition-color);
+}
+
+@media print {
+    :root {
+        --light-gray: rgb(200, 200, 200);
+        --bg-color: white;
+        --eval-color: black;
+        --eval-unit-color: var(--light-gray);
+        --comment-color: var(--light-gray);
+        --unit-definition-color: var(--light-gray);
+    }
+
+    [data-platform="darwin"] .titleBar {
+        display: none;
+    }
+
+    body {
+        caret-color: transparent;
+    }
+
+    textarea {
+        display: none !important;
+    }
+
+    #root,
+    body {
+        overflow: auto;
+        height: auto;
+    }
 }

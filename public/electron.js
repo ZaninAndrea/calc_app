@@ -3,54 +3,52 @@ const path = require("path");
 const isDev = require("electron-is-dev");
 const child_process = require("child_process");
 const fs = require("fs");
+const fetch = require("isomorphic-fetch");
+
+// Run server in the background
+child_process.spawn("./public/calc-notebook", ["server"], {
+  env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
+  cwd: app.getAppPath(),
+  windowsHide: true
+});
 
 let lastPath = "";
 let sourceCode = "";
 
 let updateLocked = false;
 let queuedUpdate = null;
-function updateEvaluations(source) {
-  return new Promise(resolve => {
-    if (updateLocked) {
-      queuedUpdate = source;
-      return;
-    }
+async function updateEvaluations(source) {
+  if (updateLocked) {
+    queuedUpdate = source;
+    return;
+  }
 
-    updateLocked = true;
-    const process = child_process.execFile(
-      "./public/calc-notebook",
-      ["execute"],
-      {
-        env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
-        cwd: app.getAppPath()
-      },
-      async (err, stdout, stderr) => {
-        if (err) {
-          let emptyEvals = [];
+  updateLocked = true;
 
-          for (let i = 0; i < source.split("\n").length; i++) {
-            emptyEvals.push("X");
-          }
-          mainWindow.webContents.send("evaluations", emptyEvals, source);
-        } else {
-          let parsedEvals = stdout.toString().split("\n");
-          parsedEvals = parsedEvals.slice(0, parsedEvals.length - 1);
-          mainWindow.webContents.send("evaluations", parsedEvals, source);
-        }
+  await fetch("http://localhost:7894/execute", {
+    body: source,
+    method: "POST"
+  })
+    .then(res => res.text())
+    .then(evals =>
+      mainWindow.webContents.send("evaluations", evals.split("\n"), source)
+    )
+    .catch(err => {
+      console.log(err);
+      let emptyEvals = [];
 
-        updateLocked = false;
-        if (queuedUpdate !== null) {
-          source = queuedUpdate;
-          queuedUpdate = null;
-          updateEvaluations(source);
-        }
-
-        resolve();
+      for (let i = 0; i < source.split("\n").length; i++) {
+        emptyEvals.push("X");
       }
-    );
-    process.stdin.write(source);
-    process.stdin.end();
-  });
+      mainWindow.webContents.send("evaluations", emptyEvals, source);
+    });
+
+  updateLocked = false;
+  if (queuedUpdate !== null) {
+    source = queuedUpdate;
+    queuedUpdate = null;
+    updateEvaluations(source);
+  }
 }
 
 let autosave = false;
@@ -75,20 +73,15 @@ ipcMain.on("update", (_, source) => {
   }
 });
 
-ipcMain.on("colorize", (e, source) => {
+ipcMain.on("colorize", async (e, source) => {
   try {
-    let colorize = child_process.execFileSync(
-      "./public/calc-notebook",
-      ["colorize"],
-      {
-        env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
-        cwd: app.getAppPath(),
-        input: source
-      }
-    );
+    const colorize = await fetch("http://localhost:7894/colorize", {
+      body: source,
+      method: "POST"
+    }).then(res => res.text());
 
-    e.returnValue = colorize.toString();
-  } catch (e) {
+    e.returnValue = colorize;
+  } catch (err) {
     e.returnValue = source;
   }
 });
@@ -310,6 +303,15 @@ function createWindow() {
   Menu.setApplicationMenu(menu);
 
   mainWindow.webContents.send("autosave", autosave);
+
+  const currenciesConversions = fetch("https://api.exchangeratesapi.io/latest")
+    .then(res => res.json())
+    .then(currenciesConversions =>
+      fetch("http://localhost:7894/currencies", {
+        method: "POST",
+        body: JSON.stringify(currenciesConversions.rates)
+      })
+    );
 }
 
 app.on("ready", createWindow);

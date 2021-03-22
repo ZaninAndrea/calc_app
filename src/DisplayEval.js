@@ -73,11 +73,15 @@ export default function DisplayEval({
     );
   }
 
-  if (evaluation === "!") {
+  if (evaluation.startsWith("!")) {
     return (
       <>
         {paddingLines}
-        <span className="error" key={"line-" + lineIndex}>
+        <span
+          className="error"
+          key={"line-" + lineIndex}
+          title={evaluation.slice(2)}
+        >
           ERR
         </span>
       </>

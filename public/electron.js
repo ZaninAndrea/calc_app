@@ -6,11 +6,24 @@ const fs = require("fs");
 const fetch = require("isomorphic-fetch");
 
 // Run server in the background
-child_process.spawn("./public/calc-notebook", ["server"], {
-  env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
-  cwd: app.getAppPath(),
-  windowsHide: true
-});
+child_process
+  .spawn("./public/calc-notebook", ["server"], {
+    env: { ATOM_SHELL_INTERNAL_RUN_AS_NODE: "1" },
+    cwd: app.getAppPath(),
+    windowsHide: true
+  })
+  .stdout.pipe(process.stdout);
+
+const isServerUp = () =>
+  new Promise((resolve, reject) =>
+    fetch("http://localhost:7894/colorize", {
+      body: "",
+      method: "POST"
+    })
+      .then(() => resolve(true))
+      .catch(() => resolve(false))
+  );
+const wait = ms => new Promise(resolve => setTimeout(() => resolve(), ms));
 
 let lastPath = "";
 let sourceCode = "";
@@ -115,7 +128,13 @@ ipcMain.on("setAutosave", (_, val) => {
   }
 });
 
-function createWindow() {
+async function createWindow() {
+  while (!(await isServerUp())) {
+    console.log("Waiting for server to boot up");
+    await wait(100);
+  }
+
+  console.log("Server is up");
   const isMac = process.platform === "darwin";
 
   mainWindow = new BrowserWindow({
@@ -304,7 +323,7 @@ function createWindow() {
 
   mainWindow.webContents.send("autosave", autosave);
 
-  const currenciesConversions = fetch("https://api.exchangeratesapi.io/latest")
+  fetch("https://api.exchangeratesapi.io/latest")
     .then(res => res.json())
     .then(currenciesConversions =>
       fetch("http://localhost:7894/currencies", {
@@ -316,7 +335,6 @@ function createWindow() {
 
 app.on("ready", createWindow);
 
-// on MacOS leave process running also with no windows
 app.on("window-all-closed", () => {
   app.quit();
 });

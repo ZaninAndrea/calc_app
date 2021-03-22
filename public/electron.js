@@ -86,14 +86,31 @@ ipcMain.on("update", (_, source) => {
   }
 });
 
+let colorizeCache = new Map();
 ipcMain.on("colorize", async (e, source) => {
   try {
-    const colorize = await fetch("http://localhost:7894/colorize", {
-      body: source,
-      method: "POST"
-    }).then(res => res.text());
+    const lines = source.split("\n");
 
-    e.returnValue = colorize;
+    const evaluationPromises = lines.map(line => {
+      if (colorizeCache.has(line)) {
+        return colorizeCache.get(line);
+      }
+
+      return fetch("http://localhost:7894/colorize", {
+        body: line,
+        method: "POST"
+      }).then(res => res.text());
+    });
+
+    const evaluations = await Promise.all(evaluationPromises);
+    const colorized = evaluations.join("\n");
+
+    e.returnValue = colorized;
+
+    colorizeCache = new Map();
+    for (let i = 0; i < lines.length; i++) {
+      colorizeCache.set(lines[i], evaluations[i]);
+    }
   } catch (err) {
     e.returnValue = source;
   }

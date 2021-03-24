@@ -38,10 +38,13 @@ async function updateEvaluations(source) {
 
   updateLocked = true;
 
-  await fetch("http://localhost:7894/execute", {
-    body: source,
-    method: "POST"
-  })
+  await fetch(
+    "http://localhost:7894/execute?bearer=" + process.env.IGLOO_BEARER,
+    {
+      body: source,
+      method: "POST"
+    }
+  )
     .then(res => res.text())
     .then(evals =>
       mainWindow.webContents.send("evaluations", evals.split("\n"), source)
